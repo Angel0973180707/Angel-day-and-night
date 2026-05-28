@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>晨型人／夜型人評估</title>
+  <style>
+    :root{
+      --bg:#f7f1e6;
+      --card:#fffaf0;
+      --green:#6f8b5f;
+      --blue:#466c9f;
+      --gold:#f3b23f;
+      --text:#2f2a24;
+      --muted:#7b7167;
+      --line:#e8dcc8;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;
+      background:linear-gradient(180deg,#fff8ea,#eef5ff);
+      color:var(--text);
+      line-height:1.7;
+    }
+    .app{
+      max-width:960px;
+      margin:auto;
+      padding:24px;
+    }
+    .hero{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:28px;
+      box-shadow:0 10px 30px rgba(80,60,30,.08);
+      text-align:center;
+    }
+    .logo{
+      font-size:42px;
+      margin-bottom:8px;
+    }
+    h1{
+      margin:0;
+      font-size:32px;
+      color:#193b6a;
+    }
+    .subtitle{
+      color:var(--muted);
+      margin-top:10px;
+    }
+    .card{
+      background:rgba(255,250,240,.92);
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:22px;
+      margin-top:20px;
+      box-shadow:0 8px 24px rgba(80,60,30,.06);
+    }
+    .question{
+      margin-bottom:22px;
+    }
+    .question h3{
+      margin:0 0 12px;
+      font-size:20px;
+      color:#2d4d7a;
+    }
+    label{
+      display:block;
+      background:#fff;
+      border:1px solid #eadfce;
+      border-radius:16px;
+      padding:12px 14px;
+      margin:8px 0;
+      cursor:pointer;
+    }
+    input{
+      margin-right:8px;
+    }
+    button{
+      width:100%;
+      border:0;
+      border-radius:999px;
+      padding:16px 20px;
+      font-size:20px;
+      font-weight:700;
+      color:white;
+      background:linear-gradient(90deg,var(--green),var(--blue));
+      cursor:pointer;
+      margin-top:10px;
+    }
+    button:hover{
+      opacity:.92;
+    }
+    .result{
+      display:none;
+      text-align:center;
+    }
+    .result h2{
+      font-size:30px;
+      color:#193b6a;
+      margin-bottom:8px;
+    }
+    .badge{
+      display:inline-block;
+      padding:8px 18px;
+      border-radius:999px;
+      background:#fff1c7;
+      color:#895b00;
+      font-weight:700;
+      margin-bottom:12px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:14px;
+      margin-top:18px;
+      text-align:left;
+    }
+    .tip{
+      background:#fff;
+      border:1px solid #eadfce;
+      border-radius:18px;
+      padding:14px;
+    }
+    .tip strong{
+      color:#2d4d7a;
+    }
+    .quote{
+      margin-top:20px;
+      padding:18px;
+      border-radius:20px;
+      background:#f4f8ec;
+      color:#557246;
+      font-size:22px;
+      font-weight:700;
+    }
+    .reset{
+      background:var(--gold);
+      margin-top:16px;
+    }
+    @media(max-width:720px){
+      .app{padding:16px}
+      h1{font-size:26px}
+      .grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <div class="logo">☀️</div>
+      <h1>晨型人／夜型人評估</h1>
+      <p class="subtitle">了解自己的生理時鐘，順著節奏安排生活，讓大腦在對的時間發揮最好的力量。</p>
+    </section>
+
+    <section class="card" id="quiz"></section>
+
+    <section class="card result" id="result">
+      <div class="badge" id="badge"></div>
+      <h2 id="resultTitle"></h2>
+      <p id="resultText"></p>
+
+      <div class="grid" id="tips"></div>
+
+      <div class="quote">
+        順應自己的時鐘，才是高效生活的開始。
+      </div>
+
+      <button class="reset" onclick="restart()">重新評估</button>
+    </section>
+  </main>
+
+  <script>
+    const questions = [
+      {
+        q:"1. 你通常什麼時候精神最好？",
+        a:[
+          ["早上最清醒，做事很順",2],
+          ["下午到傍晚才慢慢進入狀態",0],
+          ["晚上最有靈感，越晚越清楚",-2]
+        ]
+      },
+      {
+        q:"2. 沒有鬧鐘時，你比較自然會？",
+        a:[
+          ["早早醒來，不太需要賴床",2],
+          ["睡到中間時間，視前一天狀態而定",0],
+          ["很容易睡到比較晚",-2]
+        ]
+      },
+      {
+        q:"3. 你適合什麼時候做重要決策？",
+        a:[
+          ["上午，頭腦最清楚",2],
+          ["下午，狀態比較穩",0],
+          ["晚上，思考最深入",-2]
+        ]
+      },
+      {
+        q:"4. 晚上要你早睡時，你通常覺得？",
+        a:[
+          ["很自然，身體會想休息",2],
+          ["可以配合，但需要調整",0],
+          ["很難，晚上反而更清醒",-2]
+        ]
+      },
+      {
+        q:"5. 你比較喜歡哪種工作節奏？",
+        a:[
+          ["早點開始，早點完成",2],
+          ["中段穩定推進",0],
+          ["晚上安靜時集中完成",-2]
+        ]
+      },
+      {
+        q:"6. 你在晚上靈感突然變多的頻率？",
+        a:[
+          ["很少，晚上容易累",2],
+          ["偶爾會，看狀況",0],
+          ["很常，晚上最容易有想法",-2]
+        ]
+      }
+    ];
+
+    const quiz = document.getElementById("quiz");
+
+    function renderQuiz(){
+      quiz.innerHTML = questions.map((item, i) => `
+        <div class="question">
+          <h3>${item.q}</h3>
+          ${item.a.map((ans, j) => `
+            <label>
+              <input type="radio" name="q${i}" value="${ans[1]}">
+              ${ans[0]}
+            </label>
+          `).join("")}
+        </div>
+      `).join("") + `<button onclick="showResult()">看我的時間型態</button>`;
+    }
+
+    function showResult(){
+      let score = 0;
+
+      for(let i=0;i<questions.length;i++){
+        const checked = document.querySelector(`input[name="q${i}"]:checked`);
+        if(!checked){
+          alert("還有題目沒有選喔！");
+          return;
+        }
+        score += Number(checked.value);
+      }
+
+      let type, title, text, tips;
+
+      if(score >= 6){
+        type = "☀️ 晨型人";
+        title = "你適合把重要事情放在早上";
+        text = "你的大腦比較早啟動，上午通常是專注力、決策力與執行力最好的時段。";
+        tips = [
+          ["黃金時段","上午 8:00～12:00 安排重要決策、規劃與深度工作。"],
+          ["晚上策略","晚上適合放慢、整理、閱讀，避免太晚刺激大腦。"],
+          ["睡眠重點","保持固定睡覺與起床時間，讓節奏更穩。"],
+          ["提醒","不要為了模仿夜貓子而硬撐，順著自己才最有效。"]
+        ];
+      }else if(score <= -6){
+        type = "🌙 夜型人";
+        title = "你適合把深度思考放在晚上";
+        text = "你的大腦較晚進入高峰，晚上比較容易出現創意、專注與深度思考。";
+        tips = [
+          ["黃金時段","晚上 20:00～24:00 適合創作、研究、策略整理。"],
+          ["白天策略","早上不要安排太多高壓任務，先用簡單工作暖機。"],
+          ["睡眠重點","即使晚睡，也要維持規律，避免睡眠時間每天大幅變動。"],
+          ["提醒","夜型不等於熬夜，重點是穩定作息與足夠睡眠。"]
+        ];
+      }else{
+        type = "🌤 混合型";
+        title = "你可以彈性安排自己的高效時段";
+        text = "你的時間型態較有彈性，可能會受到壓力、飲食、睡眠品質與生活安排影響。";
+        tips = [
+          ["觀察自己","記錄一週精神最好的時段，找出真正的高峰。"],
+          ["工作安排","把重要任務放在你最清醒的 2～3 小時。"],
+          ["睡眠重點","先追求規律，再追求早起或晚睡。"],
+          ["提醒","不要急著定義自己，身體感受會告訴你答案。"]
+        ];
+      }
+
+      document.getElementById("badge").textContent = type;
+      document.getElementById("resultTitle").textContent = title;
+      document.getElementById("resultText").textContent = text;
+      document.getElementById("tips").innerHTML = tips.map(t => `
+        <div class="tip"><strong>${t[0]}</strong><br>${t[1]}</div>
+      `).join("");
+
+      quiz.style.display = "none";
+      document.getElementById("result").style.display = "block";
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+
+    function restart(){
+      document.getElementById("result").style.display = "none";
+      quiz.style.display = "block";
+      renderQuiz();
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+
+    renderQuiz();
+  </script>
+</body>
+</html>
